@@ -42,7 +42,7 @@ type Handler struct {
 	tokensGrpc     tokens.TokensClient
 	tracer         trace.Tracer
 	bus            *bus_core.Bus
-	seventvCache   *generic_cacher.GenericCacher[*seventvintegration.ProfileResponse]
+	seventvCache   *generic_cacher.GenericCacher[*seventvintegration.Connection]
 	prefixCache    *generic_cacher.GenericCacher[model.ChannelsCommandsPrefix]
 }
 

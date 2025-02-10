@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -49,6 +50,10 @@ type Config struct {
 	ValorantHenrikApiKey string `required:"false" envconfig:"VALORANT_HENRIK_API_KEY"`
 
 	ToxicityAddr string `required:"false" envconfig:"TOXICITY_ADDR"`
+
+	EmotesCacherEmoteTTL  time.Duration `required:"false" envconfig:"EMOTES_CACHER_EMOTE_TTL" default:"168h"`
+	EmotesCacherBatchRate int           `required:"false" envconfig:"EMOTES_CACHER_BATCH_SIZE" default:"10"`
+	EmotesCacherBatchSize int           `required:"false" envconfig:"EMOTES_CACHER_BATCH_SIZE" default:"100"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {

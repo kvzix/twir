@@ -32,7 +32,6 @@ var App = fx.Module(
 	fx.Invoke(
 		uptrace.NewFx(service),
 		bus_listener.New,
-		timers.NewEmotes,
 		timers.NewOnlineUsers,
 		timers.NewStreams,
 		timers.NewCommandsAndRoles,

@@ -73,12 +73,16 @@ func (c *Pgx) GetMany(ctx context.Context, input channels.GetManyInput) ([]model
 		selectBuilder = selectBuilder.Where(`"isEnabled" = ?`, *input.Enabled)
 	}
 
-	// not need to use defaults because i wanna select all channels
+	if input.Banned != nil {
+		selectBuilder = selectBuilder.Where(`"isBanned" = ?`, *input.Banned)
+	}
+
+	// No need to use defaults because we want to select all channels.
 	if input.PerPage > 0 {
 		selectBuilder = selectBuilder.Limit(uint64(input.PerPage))
 	}
 
-	// not need to use defaults because i wanna select all channels
+	// No need to use defaults because we want to select all channels.
 	if input.Page > 0 {
 		selectBuilder = selectBuilder.Offset(uint64(input.Page * input.PerPage))
 	}

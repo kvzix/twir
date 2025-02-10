@@ -13,6 +13,7 @@ type Repository interface {
 
 type GetManyInput struct {
 	Enabled *bool
+	Banned  *bool
 	PerPage int
 	Page    int
 }

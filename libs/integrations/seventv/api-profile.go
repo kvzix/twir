@@ -11,8 +11,8 @@ import (
 
 var ErrSevenTvProfileNotFound = errors.New("7tv profile not found")
 
-func GetProfile(ctx context.Context, twitchUserID string) (ProfileResponse, error) {
-	var profile ProfileResponse
+func GetProfile(ctx context.Context, twitchUserID string) (Connection, error) {
+	var profile Connection
 	resp, err := req.
 		SetHeader("Cache-Control", "no-cache").
 		SetContext(ctx).
@@ -32,8 +32,8 @@ func GetProfile(ctx context.Context, twitchUserID string) (ProfileResponse, erro
 	return profile, nil
 }
 
-func GetProfileBySevenTvID(ctx context.Context, sevenTvId string) (ProfileResponse, error) {
-	var profile ProfileResponse
+func GetProfileBySevenTvID(ctx context.Context, sevenTvId string) (Connection, error) {
+	var profile Connection
 	resp, err := req.
 		SetHeader("Cache-Control", "no-cache").
 		SetContext(ctx).

@@ -11,13 +11,13 @@ import (
 
 func New(
 	redis *redis.Client,
-) *generic_cacher.GenericCacher[*seventvintegration.ProfileResponse] {
-	return generic_cacher.New[*seventvintegration.ProfileResponse](
-		generic_cacher.Opts[*seventvintegration.ProfileResponse]{
+) *generic_cacher.GenericCacher[*seventvintegration.Connection] {
+	return generic_cacher.New[*seventvintegration.Connection](
+		generic_cacher.Opts[*seventvintegration.Connection]{
 			Redis:     redis,
 			KeyPrefix: "cache:twir:seventv:profile:",
 			LoadFn: func(ctx context.Context, key string) (
-				*seventvintegration.ProfileResponse,
+				*seventvintegration.Connection,
 				error,
 			) {
 				profile, err := seventvintegration.GetProfile(ctx, key)
@@ -34,13 +34,13 @@ func New(
 
 func NewBySeventvID(
 	redis *redis.Client,
-) *generic_cacher.GenericCacher[*seventvintegration.ProfileResponse] {
-	return generic_cacher.New[*seventvintegration.ProfileResponse](
-		generic_cacher.Opts[*seventvintegration.ProfileResponse]{
+) *generic_cacher.GenericCacher[*seventvintegration.Connection] {
+	return generic_cacher.New[*seventvintegration.Connection](
+		generic_cacher.Opts[*seventvintegration.Connection]{
 			Redis:     redis,
 			KeyPrefix: "cache:twir:seventv:profile:by-seventv-id:",
 			LoadFn: func(ctx context.Context, key string) (
-				*seventvintegration.ProfileResponse,
+				*seventvintegration.Connection,
 				error,
 			) {
 				profile, err := seventvintegration.GetProfileBySevenTvID(ctx, key)

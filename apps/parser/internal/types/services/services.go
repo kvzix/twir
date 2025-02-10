@@ -40,8 +40,8 @@ type Services struct {
 	Bus                      *buscore.Bus
 	CommandsCache            *generic_cacher.GenericCacher[[]model.ChannelsCommands]
 	CommandsPrefixCache      *generic_cacher.GenericCacher[channelscommandsprefixmodel.ChannelsCommandsPrefix]
-	SevenTvCache             *generic_cacher.GenericCacher[*seventv.ProfileResponse]
-	SevenTvCacheBySevenTvID  *generic_cacher.GenericCacher[*seventv.ProfileResponse]
+	SevenTvCache             *generic_cacher.GenericCacher[*seventv.Connection]
+	SevenTvCacheBySevenTvID  *generic_cacher.GenericCacher[*seventv.Connection]
 	RedSync                  *redsync.Redsync
 	CommandsLock             *redsync.Mutex
 	CommandsPrefixRepository channelscommandsprefixrepository.Repository
