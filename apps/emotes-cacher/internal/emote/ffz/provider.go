@@ -39,11 +39,11 @@ func (p *Provider) Channel(ctx context.Context, channelID string) ([]emote.Emote
 }
 
 func (p *Provider) collectionToEmotes(collection ffz.EmoteSetCollection) []emote.Emote {
-	emotesIDs := make([]emote.Emote, 0)
+	emotes := make([]emote.Emote, 0)
 
 	for _, emoteSet := range collection.EmoteSets {
 		for _, globalEmote := range emoteSet.Emotes {
-			emotesIDs = append(emotesIDs, emote.Emote{
+			emotes = append(emotes, emote.Emote{
 				ID:       globalEmote.ID,
 				Name:     globalEmote.Name,
 				Provider: "ffz",
@@ -51,5 +51,5 @@ func (p *Provider) collectionToEmotes(collection ffz.EmoteSetCollection) []emote
 		}
 	}
 
-	return emotesIDs
+	return emotes
 }

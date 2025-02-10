@@ -43,15 +43,15 @@ func (p *Provider) Channel(ctx context.Context, channelID string) ([]emote.Emote
 }
 
 func (p *Provider) emoteSetToEmotes(emoteSet seventv.EmoteSet) []emote.Emote {
-	emotesIDs := make([]emote.Emote, len(emoteSet.Emotes))
+	emotes := make([]emote.Emote, len(emoteSet.Emotes))
 
 	for index, setEmote := range emoteSet.Emotes {
-		emotesIDs[index] = emote.Emote{
+		emotes[index] = emote.Emote{
 			ID:       setEmote.Id,
 			Name:     setEmote.Name,
 			Provider: "7tv",
 		}
 	}
 
-	return emotesIDs
+	return emotes
 }

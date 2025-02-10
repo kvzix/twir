@@ -16,13 +16,12 @@ func (s *Service) SyncEmotes(ctx context.Context) error {
 		return fmt.Errorf("sync global emotes: %w", err)
 	}
 
-	activeChannels, err := s.channelsRepository.GetMany(
-		ctx,
-		channels.GetManyInput{
-			Enabled: lo.ToPtr(true),
-			Banned:  lo.ToPtr(false),
-		},
-	)
+	input := channels.GetManyInput{
+		Enabled: lo.ToPtr(true),
+		Banned:  lo.ToPtr(false),
+	}
+
+	activeChannels, err := s.channelsRepository.GetMany(ctx, input)
 	if err != nil {
 		return fmt.Errorf("get active channels: %w", err)
 	}
@@ -44,24 +43,23 @@ func (s *Service) SyncEmotes(ctx context.Context) error {
 	}
 
 	if err = syncers.Wait(); err != nil {
-		return err
+		return fmt.Errorf("syncers: %w", err)
 	}
 
 	return nil
 }
 
-func (s *Service) SyncGlobalEmotes(
-	ctx context.Context,
-	expiration time.Duration,
-) error {
-	globalEmotes, err := s.getGlobalEmotes(ctx)
+func (s *Service) SyncGlobalEmotes(ctx context.Context, expiration time.Duration) error {
+	globalEmotes, err := s.fetchGlobalEmotes(ctx)
 	if err != nil {
-		return fmt.Errorf("get global emotes: %w", err)
+		return fmt.Errorf("fetch global emotes: %w", err)
 	}
+
+	inputs := s.emotesToSetEmoteInputs(globalEmotes)
 
 	err = s.emotesBatchLimiter.Batched(
 		ctx,
-		s.emotesToSetEmoteInputs(globalEmotes),
+		inputs,
 		func(ctx context.Context, batch []emotes.SetEmoteInput) error {
 			if err = s.emotesCacheRepository.SetGlobalMany(ctx, batch, expiration); err != nil {
 				return fmt.Errorf("set global emotes: %w", err)
@@ -77,19 +75,17 @@ func (s *Service) SyncGlobalEmotes(
 	return nil
 }
 
-func (s *Service) SyncChannelEmotes(
-	ctx context.Context,
-	channelID string,
-	expiration time.Duration,
-) error {
-	channelEmotes, err := s.getChannelEmotes(ctx, channelID)
+func (s *Service) SyncChannelEmotes(ctx context.Context, channelID string, expiration time.Duration) error {
+	channelEmotes, err := s.fetchChannelEmotes(ctx, channelID)
 	if err != nil {
-		return fmt.Errorf("get channel emotes: %w", err)
+		return fmt.Errorf("fetch channel emotes: %w", err)
 	}
+
+	inputs := s.emotesToSetEmoteInputs(channelEmotes)
 
 	err = s.emotesBatchLimiter.Batched(
 		ctx,
-		s.emotesToSetEmoteInputs(channelEmotes),
+		inputs,
 		func(ctx context.Context, batch []emotes.SetEmoteInput) error {
 			if err = s.emotesCacheRepository.SetChannelMany(ctx, channelID, batch, expiration); err != nil {
 				return fmt.Errorf("set channel emotes: %w", err)

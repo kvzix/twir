@@ -12,8 +12,10 @@ type BatchLimiter[T any] struct {
 }
 
 func New[T any](batchRate, batchSize int) BatchLimiter[T] {
+	limiter := ratelimit.New(batchRate)
+
 	return BatchLimiter[T]{
-		limiter:   ratelimit.New(batchRate),
+		limiter:   limiter,
 		batchSize: batchSize,
 	}
 }
@@ -34,6 +36,7 @@ func (l *BatchLimiter[T]) Batched(
 		buffer[capacity] = element
 		capacity += 1
 
+		// Batch buffer is full, execute batch on the elements from this buffer.
 		if capacity == l.batchSize {
 			err := l.limit(func() error {
 				return batch(ctx, buffer)
@@ -57,7 +60,7 @@ func (l *BatchLimiter[T]) Batched(
 	return nil
 }
 
-// limit limits execution of the function with rate-limiter.
+// limit limits execution of the provided function with rate-limiter.
 func (l *BatchLimiter[T]) limit(fn func() error) error {
 	l.limiter.Take()
 	return fn()
