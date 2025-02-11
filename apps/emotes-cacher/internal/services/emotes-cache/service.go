@@ -23,7 +23,7 @@ type Params struct {
 	fx.In
 
 	Config                config.Config
-	EmoteProviders        []emote.Provider `group:"emote-providers"`
+	EmotesProviders       []emote.Provider `group:"emote-providers"`
 	EmotesCacheRepository emotes.CacheRepository
 	ChannelsRepository    channels.Repository
 }
@@ -36,7 +36,7 @@ func NewService(params Params) *Service {
 
 	return &Service{
 		config:                params.Config,
-		emotesProviders:       params.EmoteProviders,
+		emotesProviders:       params.EmotesProviders,
 		emotesBatchLimiter:    emotesBatchLimiter,
 		emotesCacheRepository: params.EmotesCacheRepository,
 		channelsRepository:    params.ChannelsRepository,

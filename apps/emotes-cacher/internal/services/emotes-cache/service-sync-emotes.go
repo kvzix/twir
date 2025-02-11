@@ -5,40 +5,44 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cenkalti/backoff/v5"
 	"github.com/samber/lo"
 	"github.com/twirapp/twir/libs/repositories/channels"
 	"github.com/twirapp/twir/libs/repositories/emotes"
 	"golang.org/x/sync/errgroup"
 )
 
-func (s *Service) SyncEmotes(ctx context.Context) error {
-	if err := s.SyncGlobalEmotes(ctx, s.config.EmotesCacherEmoteTTL); err != nil {
-		return fmt.Errorf("sync global emotes: %w", err)
+var (
+	syncEmotesBackOff = &backoff.ExponentialBackOff{
+		InitialInterval:     1 * time.Second,
+		RandomizationFactor: 0.5,
+		Multiplier:          1.5,
+		MaxInterval:         60 * time.Second,
 	}
+)
 
-	input := channels.GetManyInput{
+func (s *Service) SyncEmotes(ctx context.Context) error {
+	syncers, _ := errgroup.WithContext(ctx)
+
+	syncers.Go(func() error {
+		return s.retrySyncEmotes(ctx, func() error {
+			return s.SyncGlobalEmotes(ctx, s.config.EmotesCacherEmoteTTL)
+		})
+	})
+
+	activeChannels, err := s.channelsRepository.GetMany(ctx, channels.GetManyInput{
 		Enabled: lo.ToPtr(true),
 		Banned:  lo.ToPtr(false),
-	}
-
-	activeChannels, err := s.channelsRepository.GetMany(ctx, input)
+	})
 	if err != nil {
 		return fmt.Errorf("get active channels: %w", err)
 	}
 
-	syncers, ctx := errgroup.WithContext(ctx)
-
-	for _, activeChannel := range activeChannels {
+	for _, channel := range activeChannels {
 		syncers.Go(func() error {
-			if err = s.SyncChannelEmotes(
-				ctx,
-				activeChannel.ID,
-				s.config.EmotesCacherEmoteTTL,
-			); err != nil {
-				return fmt.Errorf("sync channel emotes: %w", err)
-			}
-
-			return nil
+			return s.retrySyncEmotes(ctx, func() error {
+				return s.SyncChannelEmotes(ctx, channel.ID, s.config.EmotesCacherEmoteTTL)
+			})
 		})
 	}
 
@@ -96,6 +100,22 @@ func (s *Service) SyncChannelEmotes(ctx context.Context, channelID string, expir
 	)
 	if err != nil {
 		return fmt.Errorf("batch: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) retrySyncEmotes(ctx context.Context, sync func() error) error {
+	_, err := backoff.Retry(
+		ctx,
+		func() (struct{}, error) {
+			return struct{}{}, sync()
+		},
+		backoff.WithMaxTries(10),
+		backoff.WithBackOff(syncEmotesBackOff),
+	)
+	if err != nil {
+		return err
 	}
 
 	return nil

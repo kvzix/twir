@@ -3,6 +3,7 @@ package ffz
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/satont/twir/apps/emotes-cacher/internal/emote"
 	"github.com/twirapp/twir/libs/integrations/ffz"
@@ -43,8 +44,10 @@ func (p *Provider) collectionToEmotes(collection ffz.EmoteSetCollection) []emote
 
 	for _, emoteSet := range collection.EmoteSets {
 		for _, globalEmote := range emoteSet.Emotes {
+			id := strconv.FormatInt(globalEmote.ID, 10)
+
 			emotes = append(emotes, emote.Emote{
-				ID:       globalEmote.ID,
+				ID:       id,
 				Name:     globalEmote.Name,
 				Provider: "ffz",
 			})

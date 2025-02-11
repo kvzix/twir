@@ -53,7 +53,7 @@ type Config struct {
 
 	EmotesCacherEmoteTTL  time.Duration `required:"false" envconfig:"EMOTES_CACHER_EMOTE_TTL" default:"168h"`
 	EmotesCacherBatchRate int           `required:"false" envconfig:"EMOTES_CACHER_BATCH_SIZE" default:"10"`
-	EmotesCacherBatchSize int           `required:"false" envconfig:"EMOTES_CACHER_BATCH_SIZE" default:"100"`
+	EmotesCacherBatchSize int           `required:"false" envconfig:"EMOTES_CACHER_BATCH_SIZE" default:"250"`
 }
 
 func NewWithEnvPath(envPath string) (*Config, error) {

@@ -1,12 +1,14 @@
 package ffz
 
+type ID = int64
+
 type Emote struct {
-	ID   string `json:"id"`
+	ID   ID     `json:"id"`
 	Name string `json:"name"`
 }
 
 type EmoteSet struct {
-	ID     string  `json:"id"`
+	ID     ID      `json:"id"`
 	Emotes []Emote `json:"emoticons"`
 }
 

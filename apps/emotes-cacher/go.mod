@@ -14,8 +14,10 @@ replace (
 )
 
 require (
+	github.com/cenkalti/backoff/v5 v5.0.2
 	github.com/samber/lo v1.49.1
 	github.com/satont/twir/libs/config v0.0.0-20231203205548-e635accc6b72
+	github.com/satont/twir/libs/logger v0.0.0-00010101000000-000000000000
 	github.com/twirapp/twir/libs/baseapp v0.0.0-20250210025356-9ebc030c5631
 	github.com/twirapp/twir/libs/integrations v0.0.0-00010101000000-000000000000
 	github.com/twirapp/twir/libs/repositories v0.0.0-00010101000000-000000000000
@@ -77,7 +79,6 @@ require (
 	github.com/samber/slog-multi v1.2.0 // indirect
 	github.com/samber/slog-sentry/v2 v2.8.0 // indirect
 	github.com/samber/slog-zerolog/v2 v2.7.0 // indirect
-	github.com/satont/twir/libs/logger v0.0.0-00010101000000-000000000000 // indirect
 	github.com/satont/twir/libs/pubsub v0.0.0-00010101000000-000000000000 // indirect
 	github.com/satont/twir/libs/sentry v0.0.0-00010101000000-000000000000 // indirect
 	github.com/twirapp/twir/libs/bus-core v0.0.0-20240225024146-742838c78cea // indirect
@@ -102,11 +103,11 @@ require (
 	go.uber.org/mock v0.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
 	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240812133136-8ffd90a71988 // indirect
