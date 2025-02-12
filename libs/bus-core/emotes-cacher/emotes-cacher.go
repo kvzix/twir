@@ -1,10 +1,5 @@
 package emotes_cacher
 
 const (
-	EMOTES_CACHER_GLOBAL_EMOTES_SUBJECT  = "emotes-cacher.global-emotes"
-	EMOTES_CACHER_CHANNEL_EMOTES_SUBJECT = "emotes-cacher.channel-emotes"
+	EMOTES_CACHER_SYNC_EMOTES_CACHE = "emotes-cacher.sync-emotes-cache"
 )
-
-type EmotesCacheRequest struct {
-	ChannelID string
-}

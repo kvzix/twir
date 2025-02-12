@@ -35,6 +35,7 @@ var App = fx.Module(
 		timers.NewOnlineUsers,
 		timers.NewStreams,
 		timers.NewCommandsAndRoles,
+		timers.NewEmotes,
 		timers.NewBannedChannels,
 		timers.NewWatched,
 		timers.NewExpiredCommands,

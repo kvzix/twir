@@ -20,7 +20,7 @@ func NewProvider(client seventv.Client) *Provider {
 	}
 }
 
-func (p *Provider) Global(ctx context.Context) ([]emote.Emote, error) {
+func (p *Provider) GlobalEmotes(ctx context.Context) ([]emote.Emote, error) {
 	emotes, err := p.client.GlobalEmotes(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fetch global emotes: %w", err)
@@ -29,7 +29,7 @@ func (p *Provider) Global(ctx context.Context) ([]emote.Emote, error) {
 	return p.emoteSetToEmotes(emotes), nil
 }
 
-func (p *Provider) Channel(ctx context.Context, channelID string) ([]emote.Emote, error) {
+func (p *Provider) ChannelEmotes(ctx context.Context, channelID string) ([]emote.Emote, error) {
 	user, err := p.client.TwitchUser(ctx, channelID)
 	if err != nil {
 		return nil, fmt.Errorf("fetch twitch user: %w", err)

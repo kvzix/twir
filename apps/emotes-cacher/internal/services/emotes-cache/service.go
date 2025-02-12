@@ -1,8 +1,8 @@
 package emotescache
 
 import (
-	batchlimiter "github.com/satont/twir/apps/emotes-cacher/internal/batch-limiter"
 	"github.com/satont/twir/apps/emotes-cacher/internal/emote"
+	limitedbatcher "github.com/satont/twir/apps/emotes-cacher/pkg/limited-batcher"
 	config "github.com/satont/twir/libs/config"
 	"github.com/twirapp/twir/libs/repositories/channels"
 	"github.com/twirapp/twir/libs/repositories/emotes"
@@ -13,7 +13,7 @@ type Service struct {
 	config config.Config
 
 	emotesProviders       []emote.Provider
-	emotesBatchLimiter    batchlimiter.BatchLimiter[emotes.SetEmoteInput]
+	emotesLimitedBatcher  limitedbatcher.LimitedBatcher[emotes.SetEmoteInput]
 	emotesCacheRepository emotes.CacheRepository
 
 	channelsRepository channels.Repository
@@ -29,7 +29,7 @@ type Params struct {
 }
 
 func NewService(params Params) *Service {
-	emotesBatchLimiter := batchlimiter.New[emotes.SetEmoteInput](
+	emotesLimitedBatcher := limitedbatcher.New[emotes.SetEmoteInput](
 		params.Config.EmotesCacherBatchRate,
 		params.Config.EmotesCacherBatchSize,
 	)
@@ -37,7 +37,7 @@ func NewService(params Params) *Service {
 	return &Service{
 		config:                params.Config,
 		emotesProviders:       params.EmotesProviders,
-		emotesBatchLimiter:    emotesBatchLimiter,
+		emotesLimitedBatcher:  emotesLimitedBatcher,
 		emotesCacheRepository: params.EmotesCacheRepository,
 		channelsRepository:    params.ChannelsRepository,
 	}

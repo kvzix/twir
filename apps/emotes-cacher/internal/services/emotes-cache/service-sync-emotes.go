@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	syncEmotesMaxTries uint = 15
+
 	syncEmotesBackOff = &backoff.ExponentialBackOff{
 		InitialInterval:     1 * time.Second,
 		RandomizationFactor: 0.5,
@@ -24,33 +26,36 @@ var (
 func (s *Service) SyncEmotes(ctx context.Context) error {
 	syncers, _ := errgroup.WithContext(ctx)
 
-	syncers.Go(func() error {
-		return s.retrySyncEmotes(ctx, func() error {
-			return s.SyncGlobalEmotes(ctx, s.config.EmotesCacherEmoteTTL)
-		})
-	})
+	syncers.Go(
+		func() error {
+			return s.retrySyncEmotes(ctx, func() error {
+				return s.SyncGlobalEmotes(ctx, s.config.EmotesCacherEmoteTTL)
+			})
+		},
+	)
 
-	activeChannels, err := s.channelsRepository.GetMany(ctx, channels.GetManyInput{
-		Enabled: lo.ToPtr(true),
-		Banned:  lo.ToPtr(false),
-	})
+	activeChannels, err := s.channelsRepository.GetMany(
+		ctx,
+		channels.GetManyInput{
+			Enabled: lo.ToPtr(true),
+			Banned:  lo.ToPtr(false),
+		},
+	)
 	if err != nil {
 		return fmt.Errorf("get active channels: %w", err)
 	}
 
 	for _, channel := range activeChannels {
-		syncers.Go(func() error {
-			return s.retrySyncEmotes(ctx, func() error {
-				return s.SyncChannelEmotes(ctx, channel.ID, s.config.EmotesCacherEmoteTTL)
-			})
-		})
+		syncers.Go(
+			func() error {
+				return s.retrySyncEmotes(ctx, func() error {
+					return s.SyncChannelEmotes(ctx, channel.ID, s.config.EmotesCacherEmoteTTL)
+				})
+			},
+		)
 	}
 
-	if err = syncers.Wait(); err != nil {
-		return fmt.Errorf("syncers: %w", err)
-	}
-
-	return nil
+	return syncers.Wait()
 }
 
 func (s *Service) SyncGlobalEmotes(ctx context.Context, expiration time.Duration) error {
@@ -61,7 +66,7 @@ func (s *Service) SyncGlobalEmotes(ctx context.Context, expiration time.Duration
 
 	inputs := s.emotesToSetEmoteInputs(globalEmotes)
 
-	err = s.emotesBatchLimiter.Batched(
+	return s.emotesLimitedBatcher.Batch(
 		ctx,
 		inputs,
 		func(ctx context.Context, batch []emotes.SetEmoteInput) error {
@@ -72,11 +77,6 @@ func (s *Service) SyncGlobalEmotes(ctx context.Context, expiration time.Duration
 			return nil
 		},
 	)
-	if err != nil {
-		return fmt.Errorf("batch: %w", err)
-	}
-
-	return nil
 }
 
 func (s *Service) SyncChannelEmotes(ctx context.Context, channelID string, expiration time.Duration) error {
@@ -87,7 +87,7 @@ func (s *Service) SyncChannelEmotes(ctx context.Context, channelID string, expir
 
 	inputs := s.emotesToSetEmoteInputs(channelEmotes)
 
-	err = s.emotesBatchLimiter.Batched(
+	return s.emotesLimitedBatcher.Batch(
 		ctx,
 		inputs,
 		func(ctx context.Context, batch []emotes.SetEmoteInput) error {
@@ -98,23 +98,17 @@ func (s *Service) SyncChannelEmotes(ctx context.Context, channelID string, expir
 			return nil
 		},
 	)
-	if err != nil {
-		return fmt.Errorf("batch: %w", err)
-	}
-
-	return nil
 }
 
 func (s *Service) retrySyncEmotes(ctx context.Context, sync func() error) error {
-	_, err := backoff.Retry(
+	if _, err := backoff.Retry(
 		ctx,
 		func() (struct{}, error) {
 			return struct{}{}, sync()
 		},
-		backoff.WithMaxTries(10),
+		backoff.WithMaxTries(syncEmotesMaxTries),
 		backoff.WithBackOff(syncEmotesBackOff),
-	)
-	if err != nil {
+	); err != nil {
 		return err
 	}
 

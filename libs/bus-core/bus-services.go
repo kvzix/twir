@@ -3,7 +3,6 @@ package buscore
 import (
 	auditlogs "github.com/twirapp/twir/libs/bus-core/audit-logs"
 	botsservice "github.com/twirapp/twir/libs/bus-core/bots"
-	emotes_cacher "github.com/twirapp/twir/libs/bus-core/emotes-cacher"
 	"github.com/twirapp/twir/libs/bus-core/eval"
 	"github.com/twirapp/twir/libs/bus-core/eventsub"
 	"github.com/twirapp/twir/libs/bus-core/parser"
@@ -43,8 +42,7 @@ type botsBus struct {
 }
 
 type emotesCacherBus struct {
-	CacheGlobalEmotes  Queue[struct{}, struct{}]
-	CacheChannelEmotes Queue[emotes_cacher.EmotesCacheRequest, struct{}]
+	SyncEmotesCache Queue[struct{}, struct{}]
 }
 
 type timersBus struct {

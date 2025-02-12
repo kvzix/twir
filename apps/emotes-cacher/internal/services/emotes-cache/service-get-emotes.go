@@ -14,29 +14,25 @@ type (
 )
 
 func (s *Service) fetchGlobalEmotes(ctx context.Context) ([]emote.Emote, error) {
-	fetcher := func(ctx context.Context, provider emote.Provider) ([]emote.Emote, error) {
-		globalEmotes, err := provider.Global(ctx)
+	return s.fetchEmotes(ctx, func(ctx context.Context, provider emote.Provider) ([]emote.Emote, error) {
+		globalEmotes, err := provider.GlobalEmotes(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		return globalEmotes, nil
-	}
-
-	return s.fetchEmotes(ctx, fetcher)
+	})
 }
 
 func (s *Service) fetchChannelEmotes(ctx context.Context, channelID string) ([]emote.Emote, error) {
-	fetcher := func(ctx context.Context, provider emote.Provider) ([]emote.Emote, error) {
-		channelEmotes, err := provider.Channel(ctx, channelID)
+	return s.fetchEmotes(ctx, func(ctx context.Context, provider emote.Provider) ([]emote.Emote, error) {
+		channelEmotes, err := provider.ChannelEmotes(ctx, channelID)
 		if err != nil {
 			return nil, err
 		}
 
 		return channelEmotes, nil
-	}
-
-	return s.fetchEmotes(ctx, fetcher)
+	})
 }
 
 func (s *Service) fetchEmotes(ctx context.Context, fetch EmotesFetchFunc) ([]emote.Emote, error) {
@@ -63,7 +59,7 @@ func (s *Service) fetchEmotes(ctx context.Context, fetch EmotesFetchFunc) ([]emo
 	}
 
 	if err := fetchers.Wait(); err != nil {
-		return nil, fmt.Errorf("fetchers: %w", err)
+		return nil, err
 	}
 
 	return emotes, nil

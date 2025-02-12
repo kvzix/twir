@@ -13,7 +13,7 @@ type (
 	}
 
 	Provider interface {
-		Global(ctx context.Context) ([]Emote, error)
-		Channel(ctx context.Context, channelID string) ([]Emote, error)
+		GlobalEmotes(ctx context.Context) ([]Emote, error)
+		ChannelEmotes(ctx context.Context, channelID string) ([]Emote, error)
 	}
 )

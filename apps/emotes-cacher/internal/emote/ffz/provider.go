@@ -21,7 +21,7 @@ func NewProvider(client ffz.Client) *Provider {
 	}
 }
 
-func (p *Provider) Global(ctx context.Context) ([]emote.Emote, error) {
+func (p *Provider) GlobalEmotes(ctx context.Context) ([]emote.Emote, error) {
 	collection, err := p.client.GlobalEmoteSetCollection(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fetch global emote set collection: %w", err)
@@ -30,7 +30,7 @@ func (p *Provider) Global(ctx context.Context) ([]emote.Emote, error) {
 	return p.collectionToEmotes(collection), nil
 }
 
-func (p *Provider) Channel(ctx context.Context, channelID string) ([]emote.Emote, error) {
+func (p *Provider) ChannelEmotes(ctx context.Context, channelID string) ([]emote.Emote, error) {
 	collection, err := p.client.RoomEmoteSetCollection(ctx, channelID)
 	if err != nil {
 		return nil, fmt.Errorf("fetch room emote set collection: %w", err)
